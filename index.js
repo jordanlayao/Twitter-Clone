@@ -21,12 +21,15 @@ function getFeedHtml() {
               <p class="tweet-text">${tweet.tweetText}</p>
               <div class="tweet-details">
                   <span class="tweet-detail">
+                      <i class="fa-regular fa-comment-dots" data-reply="${tweet.uuid}"></i>
                       ${tweet.replies.length}
                   </span>
                   <span class="tweet-detail">
+                      <i class="fa-solid fa-heart" data-like="${tweet.uuid}"></i>
                       ${tweet.likes}
                   </span>
                   <span class="tweet-detail">
+                      <i class="fa-solid fa-retweet" data-retweet="${tweet.uuid}"></i>
                       ${tweet.retweets}
                   </span>
               </div>   
@@ -36,4 +39,14 @@ function getFeedHtml() {
     `
   })
 
+  return feedHtml
+
 }
+
+function render(){
+  
+  document.getElementById('feed').innerHTML = getFeedHtml()
+
+}
+
+render()
