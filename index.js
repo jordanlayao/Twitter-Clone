@@ -7,6 +7,12 @@ tweetBtn.addEventListener('click', function(){
   console.log(textInput.value)
 })
 
+document.addEventListener('click', function(e){
+  if (e.target.dataset.like) {
+    console.log(e.target.dataset.like)
+  }
+})
+
 function getFeedHtml() {
 
   let feedHtml = ``
@@ -40,7 +46,6 @@ function getFeedHtml() {
   })
 
   return feedHtml
-
 }
 
 function render(){
