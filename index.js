@@ -1,18 +1,24 @@
 import { tweetsData } from '/data.js'
+import { v4 as uuidv4 } from 'uuid'
+
+console.log(uuidv4())
 
 const textInput = document.getElementById('text-input')
-const tweetBtn = document.getElementById('tweet-btn')
 
-tweetBtn.addEventListener('click', function(){
-  console.log(textInput.value)
-})
+
 
 document.addEventListener('click', function(e){
   if (e.target.dataset.like) {
     handleLikeClick(e.target.dataset.like)
   }
-  if (e.target.dataset.retweet) {
+  else if (e.target.dataset.retweet) {
     handleRetweetClick(e.target.dataset.retweet)
+  }
+  else if (e.target.dataset.reply) {
+    handleReplyClick(e.target.dataset.reply)
+  }
+  else if (e.target.id === 'tweet-btn') {
+    handleTweetBtnClick()
   }
 })
 
@@ -47,6 +53,14 @@ function handleRetweetClick(tweetId){
   }
   targetTweetObj.isRetweeted = !targetTweetObj.isRetweeted
   render() 
+}
+
+function handleReplyClick(replyId){
+  document.getElementById(`replies-${replyId}`).classList.toggle('hidden')
+}
+
+function handleTweetBtnClick(){
+  console.log(textInput.value)
 }
 
 
