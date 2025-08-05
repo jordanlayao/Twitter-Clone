@@ -1,4 +1,4 @@
-# Viw Project
+# View Project
 https://twitterclonelayao.netlify.app/
 
 Install the dependencies and run the project
