@@ -1,4 +1,6 @@
-# Getting Started
+# Viw Project
+https://twitterclonelayao.netlify.app/
+
 Install the dependencies and run the project
 ```
 npm install
