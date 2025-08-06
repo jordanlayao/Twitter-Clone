@@ -23,10 +23,10 @@ document.addEventListener('click', function(e){
   else if (e.target.id === 'tweet-btn') {
     handleTweetBtnClick()
   }
-  else if (e.target.id === 'reply-btn') {
+  else if (e.target.classList.contains('reply-btn')) {
     handleReplySubmit()
   }
-  else if (e.target.id === 'cancel-reply-btn') {
+  else if (e.target.classList.contains('cancel-reply-btn')) {
     handleCancelReply()
   }
 })
@@ -50,8 +50,6 @@ function handleLikeClick(tweetId){
 }
 
 const textInput = document.getElementById('text-input')
-const replyTextInput = document.getElementById('reply-text-input')
-const replyInputContainer = document.getElementById('reply-input-container')
 
 function handleRetweetClick(tweetId){
   const targetTweetObj = tweetsData.filter(function(tweet){
@@ -84,39 +82,71 @@ function handleReplyClick(replyId){
 }
 
 function handleReplyToClick(tweetId){
+  // Hide any existing reply inputs
+  hideAllReplyInputs()
+  
   replyingToTweetId = tweetId
-  replyInputContainer.classList.remove('hidden')
-  replyTextInput.focus()
+  
+  // Show reply input for this specific tweet
+  const replyInput = document.getElementById(`reply-input-${tweetId}`)
+  if (replyInput) {
+    replyInput.classList.remove('hidden')
+    const textarea = replyInput.querySelector('textarea')
+    if (textarea) {
+      textarea.focus()
+    }
+  }
 }
 
 function handleReplySubmit(){
-  if (replyTextInput.value.trim() && replyingToTweetId) {
-    const targetTweet = tweetsData.find(tweet => tweet.uuid === replyingToTweetId)
+  if (replyingToTweetId) {
+    const replyInput = document.getElementById(`reply-input-${replyingToTweetId}`)
+    const textarea = replyInput.querySelector('textarea')
     
-    if (targetTweet) {
-      const newReply = {
-        handle: '@Scrimba',
-        profilePic: 'images/scrimbalogo.png',
-        tweetText: replyTextInput.value
+    if (textarea && textarea.value.trim()) {
+      const targetTweet = tweetsData.find(tweet => tweet.uuid === replyingToTweetId)
+      
+      if (targetTweet) {
+        const newReply = {
+          handle: '@Scrimba',
+          profilePic: 'images/scrimbalogo.png',
+          tweetText: textarea.value
+        }
+        
+        targetTweet.replies.push(newReply)
+        
+        // Clear and hide reply input
+        textarea.value = ''
+        replyInput.classList.add('hidden')
+        replyingToTweetId = null
+        
+        // Re-render to show the new reply
+        render()
       }
-      
-      targetTweet.replies.push(newReply)
-      
-      // Clear and hide reply input
-      replyTextInput.value = ''
-      replyInputContainer.classList.add('hidden')
-      replyingToTweetId = null
-      
-      // Re-render to show the new reply
-      render()
     }
   }
 }
 
 function handleCancelReply(){
-  replyTextInput.value = ''
-  replyInputContainer.classList.add('hidden')
-  replyingToTweetId = null
+  if (replyingToTweetId) {
+    const replyInput = document.getElementById(`reply-input-${replyingToTweetId}`)
+    const textarea = replyInput.querySelector('textarea')
+    
+    if (textarea) {
+      textarea.value = ''
+    }
+    if (replyInput) {
+      replyInput.classList.add('hidden')
+    }
+    replyingToTweetId = null
+  }
+}
+
+function hideAllReplyInputs(){
+  const replyInputs = document.querySelectorAll('.reply-input-container')
+  replyInputs.forEach(input => {
+    input.classList.add('hidden')
+  })
 }
 
 function handleTweetBtnClick(){
@@ -202,6 +232,18 @@ function getFeedHtml() {
       </div>
       <div id="replies-${tweet.uuid}" class="${visibleReplies.has(tweet.uuid) ? '' : 'hidden'}">
         ${repliesHtml}
+      </div>
+      
+      <!-- Reply Input for this specific tweet -->
+      <div id="reply-input-${tweet.uuid}" class="reply-input-container hidden">
+        <div class="tweet-input-area">
+          <img src="images/scrimbalogo.png" class="profile-pic">
+          <textarea placeholder="Your reply"></textarea>
+        </div>
+        <div class="reply-buttons">
+          <button class="reply-btn" data-tweet-id="${tweet.uuid}">Reply</button>
+          <button class="cancel-reply-btn" data-tweet-id="${tweet.uuid}">Cancel</button>
+        </div>
       </div>
     </div>
     `
