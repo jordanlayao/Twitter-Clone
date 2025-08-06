@@ -1,6 +1,9 @@
 import { tweetsData } from '/data.js'
 import { v4 as uuidv4 } from 'uuid'
 
+// Track which replies are currently visible
+let visibleReplies = new Set()
+
 document.addEventListener('click', function(e){
   if (e.target.dataset.like) {
     handleLikeClick(e.target.dataset.like)
@@ -52,7 +55,18 @@ function handleRetweetClick(tweetId){
 }
 
 function handleReplyClick(replyId){
-  document.getElementById(`replies-${replyId}`).classList.toggle('hidden')
+  const repliesElement = document.getElementById(`replies-${replyId}`)
+  const isHidden = repliesElement.classList.contains('hidden')
+  
+  if (isHidden) {
+    // Show replies
+    repliesElement.classList.remove('hidden')
+    visibleReplies.add(replyId)
+  } else {
+    // Hide replies
+    repliesElement.classList.add('hidden')
+    visibleReplies.delete(replyId)
+  }
 }
 
 function handleTweetBtnClick(){
@@ -133,7 +147,7 @@ function getFeedHtml() {
               </div>   
           </div>            
       </div>
-      <div id="replies-${tweet.uuid}">
+      <div id="replies-${tweet.uuid}" class="${visibleReplies.has(tweet.uuid) ? '' : 'hidden'}">
         ${repliesHtml}
       </div>
     </div>
