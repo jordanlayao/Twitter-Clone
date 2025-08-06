@@ -4,6 +4,9 @@ import { v4 as uuidv4 } from 'uuid'
 // Track which replies are currently visible
 let visibleReplies = new Set()
 
+// Track which tweet we're replying to
+let replyingToTweetId = null
+
 document.addEventListener('click', function(e){
   if (e.target.dataset.like) {
     handleLikeClick(e.target.dataset.like)
@@ -14,8 +17,17 @@ document.addEventListener('click', function(e){
   else if (e.target.dataset.reply) {
     handleReplyClick(e.target.dataset.reply)
   }
+  else if (e.target.dataset.replyTo) {
+    handleReplyToClick(e.target.dataset.replyTo)
+  }
   else if (e.target.id === 'tweet-btn') {
     handleTweetBtnClick()
+  }
+  else if (e.target.id === 'reply-btn') {
+    handleReplySubmit()
+  }
+  else if (e.target.id === 'cancel-reply-btn') {
+    handleCancelReply()
   }
 })
 
@@ -38,6 +50,8 @@ function handleLikeClick(tweetId){
 }
 
 const textInput = document.getElementById('text-input')
+const replyTextInput = document.getElementById('reply-text-input')
+const replyInputContainer = document.getElementById('reply-input-container')
 
 function handleRetweetClick(tweetId){
   const targetTweetObj = tweetsData.filter(function(tweet){
@@ -67,6 +81,42 @@ function handleReplyClick(replyId){
     repliesElement.classList.add('hidden')
     visibleReplies.delete(replyId)
   }
+}
+
+function handleReplyToClick(tweetId){
+  replyingToTweetId = tweetId
+  replyInputContainer.classList.remove('hidden')
+  replyTextInput.focus()
+}
+
+function handleReplySubmit(){
+  if (replyTextInput.value.trim() && replyingToTweetId) {
+    const targetTweet = tweetsData.find(tweet => tweet.uuid === replyingToTweetId)
+    
+    if (targetTweet) {
+      const newReply = {
+        handle: '@Scrimba',
+        profilePic: 'images/scrimbalogo.png',
+        tweetText: replyTextInput.value
+      }
+      
+      targetTweet.replies.push(newReply)
+      
+      // Clear and hide reply input
+      replyTextInput.value = ''
+      replyInputContainer.classList.add('hidden')
+      replyingToTweetId = null
+      
+      // Re-render to show the new reply
+      render()
+    }
+  }
+}
+
+function handleCancelReply(){
+  replyTextInput.value = ''
+  replyInputContainer.classList.add('hidden')
+  replyingToTweetId = null
 }
 
 function handleTweetBtnClick(){
@@ -135,6 +185,10 @@ function getFeedHtml() {
                   <span class="tweet-detail">
                       <i class="fa-regular fa-comment-dots" data-reply="${tweet.uuid}"></i>
                       ${tweet.replies.length}
+                  </span>
+                  <span class="tweet-detail">
+                      <i class="fa-solid fa-reply" data-reply-to="${tweet.uuid}"></i>
+                      Reply
                   </span>
                   <span class="tweet-detail">
                       <i class="fa-solid fa-heart ${likeIconClass}" data-like="${tweet.uuid}"></i>
