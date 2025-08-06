@@ -188,7 +188,6 @@ function getFeedHtml() {
                   </span>
                   <span class="tweet-detail">
                       <i class="fa-solid fa-reply" data-reply-to="${tweet.uuid}"></i>
-                      Reply
                   </span>
                   <span class="tweet-detail">
                       <i class="fa-solid fa-heart ${likeIconClass}" data-like="${tweet.uuid}"></i>
